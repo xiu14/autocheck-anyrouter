@@ -173,6 +173,14 @@ class CheckinService:
 					result = response.json()
 					if result.get('ret') == 1 or result.get('code') == 0 or result.get('success'):
 						logger.success('签到成功!', account_name)
+						# 签到成功后再次获取用户信息，避免通知里展示签到前的余额。
+						updated_user_info = await self._get_user_info(
+							client=client,
+							headers=headers,
+							privacy_handler=privacy_handler,
+						)
+						if updated_user_info and updated_user_info.get('success'):
+							user_info = updated_user_info
 						return True, user_info
 
 					# 签到失败
